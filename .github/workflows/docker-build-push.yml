@@ -25,5 +25,5 @@ jobs:
       run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USER }}/logiboutik-front:$(date +%s) --tag ${{ secrets.DOCKER_USER }}/logiboutik-front:latest 
     
     - name: Docker Push
-      run: docker push --all-tags ${{secrets.DOCKER_USER}}/hvac-gr01-eq11
+      run: docker push --all-tags ${{secrets.DOCKER_USER}}/logiboutik-front
     
