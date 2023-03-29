@@ -1,0 +1,15 @@
+{
+  "header": "Article",
+  "list": "Liste des articles",
+  "create": "Créer un article",
+  "name": "Nom de l'article",
+  "price": "Prix de l'article",
+  "quantity": "Stock actuel",
+  "shop_placeholder": "Choisir une boutique",
+  "shop": "Boutique de l'article",
+  "shopId": "Id de la boutique de l'article",
+  "historic": "Historique de l'article",
+  "noHistorcic": "Pas d'historique",
+  "delete": "Supprimer l'article",
+  "currentStock": "Stock actuel"
+}

@@ -1,0 +1,13 @@
+{
+  "stock_for": "Fiche de stock pour",
+  "article": "Article",
+  "price_ttc": "Prix TTC",
+  "actual_quantity": "Quantité actuelle",
+  "sell_quantity": "Quantité vendue",
+  "retrieve_quantity": "Quantité récupérée",
+  "client": "Client",
+  "client_placeholder": "Sélectionnez un client",
+  "stock_name": "Nom du stock",
+  "download": "Télécharger",
+  "create": "Créer un stock"
+}

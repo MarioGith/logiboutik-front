@@ -1,0 +1,21 @@
+{
+  "header": "Facture",
+  "for": "Facture pour",
+  "name": "Facture du mois de",
+  "total": "Total à payer",
+  "ttc": "Total TTC",
+  "ht": "Total HT",
+  "fee": "Total frais de vente (22,5%)",
+  "note": "Note",
+  "page": "Page",
+  "details": "Details",
+  "startDate": "Date de début",
+  "endDate": "Date de fin",
+  "edit": "Editer une facture",
+  "download": "Télécharger la facture",
+  "article": "Article",
+  "price_ttc": "Prix TTC",
+  "price_ht": "Prix HT",
+  "sell_quantity": "Quantité vendue",
+  "billing": "Facturation"
+}

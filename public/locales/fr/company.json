@@ -1,0 +1,12 @@
+{
+  "info": "Infomartion sur l'entreprise",
+  "name": "Nom de l'entreprise",
+  "address": "Adresse de l'entreprise",
+  "phone": "Téléphone de l'entreprise",
+  "website": "Site web de l'entreprise",
+  "client": "Client",
+  "client_name": "Nom du client",
+  "client_address": "Adresse du client",
+  "client_city": "Ville du client",
+  "reset": "Réinitialiser les données de l'entreprise"
+}

@@ -1,0 +1,16 @@
+{
+  "header": "Transaction",
+  "list": "Liste des transactions",
+  "article": "Article de la transaction",
+  "create": "Créer une transaction",
+  "date": "Date de la transaction",
+  "quantity": "Quantité associée",
+  "transaction_type": "Type de transaction",
+  "articleId": "Id de l'article associé",
+  "sell": "Vendu",
+  "retrieve": "Repris",
+  "deposite": "Déposé",
+  "delete": "Supprimer la transaction",
+  "article_placeholder": "Sélectionner un article",
+  "transaction_type_placeholder": "Sélectionner un type de transaction"
+}
