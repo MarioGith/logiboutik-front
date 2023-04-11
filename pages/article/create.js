@@ -62,9 +62,9 @@ const CreateArticle = () => {
           className="select"
           onChange={(e) => {
             if (e) {
-              setNewArticle({ ...newArticle, shopId: e.value });
+              setNewArticle({ ...newArticle, shop: e.value });
             } else {
-              setNewArticle({ ...newArticle, shopId: "" });
+              setNewArticle({ ...newArticle, shop: "" });
             }
           }}
         />

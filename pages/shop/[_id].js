@@ -26,7 +26,11 @@ const EditShop = () => {
   };
 
   const handleEdit = async () => {
-    const res = await Handler.update("shop", _id, newShop);
+    const res = await Handler.update("shop", _id, {
+      _id,
+      name: newShop.name,
+    });
+    console.log(res);
     if (res.status === 200) {
       toast("Edited", { type: "success" });
     } else {

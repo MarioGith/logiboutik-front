@@ -49,9 +49,9 @@ const CreateArticle = () => {
           isSearchable
           onChange={(e) => {
             if (e) {
-              setNewTransaction({ ...newTransaction, articleId: e.value });
+              setNewTransaction({ ...newTransaction, article: e.value });
             } else {
-              setNewTransaction({ ...newTransaction, articleId: "" });
+              setNewTransaction({ ...newTransaction, article: "" });
             }
           }}
         />

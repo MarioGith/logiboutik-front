@@ -68,11 +68,11 @@ const EditTransaction = () => {
           className="select"
           isSearchable
           defaultValue={options.find(
-            (article) => article.value === newTransaction.articleId
+            (article) => article.value === newTransaction.article
           )}
           onChange={(e) => {
             if (e) {
-              setNewTransaction({ ...newTransaction, articleId: e.value });
+              setNewTransaction({ ...newTransaction, article: e.value });
             }
           }}
         />

@@ -18,6 +18,7 @@ const List = (props) => {
   if (loading === false) {
     const header = Object.keys(data[0]);
     header.shift();
+    header.pop();
     return (
       <div className="list">
         <table>
@@ -33,12 +34,23 @@ const List = (props) => {
               return (
                 <tr key={dat._id}>
                   {header.map((key) => {
-                    return (
-                      // eslint-disable-next-line react/jsx-key
-                      <td key={key}>
-                        <Link href={`${url}/${dat._id}`}>{dat[key]}</Link>
-                      </td>
-                    );
+                    if (dat[key]["_id"] !== undefined) {
+                      return (
+                        // eslint-disable-next-line react/jsx-key
+                        <td key={key}>
+                          <Link href={`${key}/${dat[key]["_id"]}`}>
+                            {dat[key]["name"]}
+                          </Link>
+                        </td>
+                      );
+                    } else {
+                      return (
+                        // eslint-disable-next-line react/jsx-key
+                        <td key={key}>
+                          <Link href={`${url}/${dat._id}`}>{dat[key]}</Link>
+                        </td>
+                      );
+                    }
                   })}
                 </tr>
               );

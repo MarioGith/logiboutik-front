@@ -59,6 +59,7 @@ const EditArticle = () => {
       toast(res.data.message, { type: "error" });
     }
   };
+  console.log(newArticle);
 
   if (!newArticle) return <></>;
 
@@ -94,13 +95,13 @@ const EditArticle = () => {
             isClearable
             placeholder={t("shop_placeholder")}
             defaultValue={options.find(
-              (shop) => shop.value === newArticle.shopId
+              (shop) => shop.value === newArticle.shop
             )}
             isSearchable
             className="select"
             onChange={(e) => {
               if (e) {
-                setNewArticle({ ...newArticle, shopId: e.value });
+                setNewArticle({ ...newArticle, shop: e.value });
               }
             }}
           />
