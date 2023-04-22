@@ -38,7 +38,7 @@ const List = (props) => {
     return (
       <div className="list">
         <div class="search__container">
-          <p class="search__title">Let's search</p>
+          <p class="search__title">{"Let's search"}</p>
           <input
             class="search__input"
             type="text"
