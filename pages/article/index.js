@@ -10,8 +10,6 @@ const ListArticle = () => {
   const router = useRouter();
   const [articles, setArticles] = useState([]);
 
-  console.log(articles);
-
   useEffect(() => {
     Handler.list("article")
       .then((res) => {

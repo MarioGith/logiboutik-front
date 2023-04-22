@@ -26,6 +26,7 @@ const EditArticle = () => {
 
     Handler.get("article", _id)
       .then((res) => {
+        console.log(res);
         res.historic = res.historic.map((his) => {
           return {
             ...his,
@@ -37,11 +38,7 @@ const EditArticle = () => {
         });
         setHistoric(res.historic);
         setStock(res.stock);
-        res.details = res.details.map((det) => {
-          return { ...det, price: det.price };
-        });
-
-        setNewArticle(res.details[0]);
+        setNewArticle(res.details);
       })
       .catch((err) => console.log(err));
   }, [_id, t]);
@@ -59,7 +56,6 @@ const EditArticle = () => {
       toast(res.data.message, { type: "error" });
     }
   };
-  console.log(newArticle);
 
   if (!newArticle) return <></>;
 

@@ -9,6 +9,14 @@ const List = (props) => {
   const { t } = useTranslation(url.split("/")[1]);
   const [loading, setLoading] = useState(true);
 
+  const [inputText, setInputText] = useState("");
+
+  const inputHandler = (e) => {
+    //convert input text to lower case
+    var lowerCase = e.target.value.toLowerCase();
+    setInputText(lowerCase);
+  };
+
   useEffect(() => {
     if (data.length !== 0) {
       setLoading(false);
@@ -19,8 +27,26 @@ const List = (props) => {
     const header = Object.keys(data[0]);
     header.shift();
     header.pop();
+
+    const filtered_data = data.filter((dat) => {
+      return (
+        Object.values(dat.article).join(" ").toLowerCase().includes(inputText) +
+        dat.date.includes(inputText)
+      );
+    });
+
     return (
       <div className="list">
+        <div class="search__container">
+          <p class="search__title">Let's search</p>
+          <input
+            class="search__input"
+            type="text"
+            placeholder="Search"
+            onChange={inputHandler}
+          />
+        </div>
+
         <table>
           <thead>
             <tr>
@@ -30,7 +56,7 @@ const List = (props) => {
             </tr>
           </thead>
           <tbody>
-            {data.map((dat) => {
+            {filtered_data.map((dat) => {
               return (
                 <tr key={dat._id}>
                   {header.map((key) => {
