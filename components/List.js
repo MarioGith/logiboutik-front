@@ -28,12 +28,12 @@ const List = (props) => {
     header.shift();
     header.pop();
 
-    const filtered_data = data.filter((dat) => {
-      return (
-        Object.values(dat.article).join(" ").toLowerCase().includes(inputText) +
-        dat.date.includes(inputText)
-      );
-    });
+    // const filtered_data = data.filter((dat) => {
+    //   return (
+    //     Object.values(dat.article).join(" ").toLowerCase().includes(inputText) +
+    //     dat.date.includes(inputText)
+    //   );
+    // });
 
     return (
       <div className="list">
@@ -56,7 +56,7 @@ const List = (props) => {
             </tr>
           </thead>
           <tbody>
-            {filtered_data.map((dat) => {
+            {data.map((dat) => {
               return (
                 <tr key={dat._id}>
                   {header.map((key) => {
