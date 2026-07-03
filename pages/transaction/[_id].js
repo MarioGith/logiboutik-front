@@ -11,7 +11,8 @@ import { setForSelect } from "../../utils";
 
 const EditTransaction = () => {
   const { t } = useTranslation(["transaction", "common"]);
-  const { router, asPath } = useRouter();
+  const router = useRouter();
+  const { asPath } = router;
   const _id = asPath.split("/")[asPath.split("/").length - 1];
 
   const [newTransaction, setNewTransaction] = useState();
@@ -39,7 +40,7 @@ const EditTransaction = () => {
         setNewTransaction(res[0]);
       })
       .catch((err) => console.log(err));
-  }, [_id, options.length, t]);
+  }, [_id]);
 
   const deleteTransaction = async () => {
     await Handler.delete("transaction", _id);

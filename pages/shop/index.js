@@ -16,7 +16,7 @@ const ListShop = () => {
         setShops(res);
       })
       .catch((err) => console.log(err));
-  }, [shops.length]);
+  }, []);
 
   if (!shops) return <></>;
 

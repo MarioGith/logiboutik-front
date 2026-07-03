@@ -16,14 +16,16 @@ const ListArticle = () => {
         res = res.map((art) => {
           return {
             ...art,
-            name: art.name[0].toUpperCase() + art.name.substring(1),
+            name: art.name
+              ? art.name[0].toUpperCase() + art.name.substring(1)
+              : "",
             price: `${art.price} €`,
           };
         });
         setArticles(res);
       })
       .catch((err) => console.log(err));
-  }, [articles.length]);
+  }, []);
 
   if (!articles) return <></>;
 

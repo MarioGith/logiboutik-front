@@ -1,13 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
 const List = (props) => {
-  const { data, url } = props;
+  const { data = [], url } = props;
   const { t } = useTranslation(url.split("/")[1]);
-  const [loading, setLoading] = useState(true);
 
   const [inputText, setInputText] = useState("");
 
@@ -17,77 +16,66 @@ const List = (props) => {
     setInputText(lowerCase);
   };
 
-  useEffect(() => {
-    if (data.length !== 0) {
-      setLoading(false);
-    }
-  }, [data.length]);
+  const rows = Array.isArray(data) ? data : [];
 
-  if (loading === false) {
-    const header = Object.keys(data[0]);
-    header.shift();
-    header.pop();
-
-    // const filtered_data = data.filter((dat) => {
-    //   return (
-    //     Object.values(dat.article).join(" ").toLowerCase().includes(inputText) +
-    //     dat.date.includes(inputText)
-    //   );
-    // });
-
-    return (
-      <div className="list">
-        <div class="search__container">
-          <p class="search__title">{"Let's search"}</p>
-          <input
-            class="search__input"
-            type="text"
-            placeholder="Search"
-            onChange={inputHandler}
-          />
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              {header.map((head) => (
-                <th key={head}>{t(head, { ns: url.split("/")[1] })}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((dat) => {
-              return (
-                <tr key={dat._id}>
-                  {header.map((key) => {
-                    if (dat[key] != null && dat[key]["_id"] !== undefined) {
-                      return (
-                        // eslint-disable-next-line react/jsx-key
-                        <td key={key}>
-                          <Link href={`${key}/${dat[key]["_id"]}`}>
-                            {dat[key]["name"]}
-                          </Link>
-                        </td>
-                      );
-                    } else {
-                      return (
-                        // eslint-disable-next-line react/jsx-key
-                        <td key={key}>
-                          <Link href={`${url}/${dat._id}`}>{dat[key]}</Link>
-                        </td>
-                      );
-                    }
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    );
-  } else {
+  if (rows.length === 0) {
     return <div>Data is empty</div>;
   }
+
+  const header = Object.keys(rows[0]);
+  header.shift();
+  header.pop();
+
+  return (
+    <div className="list">
+      <div className="search__container">
+        <p className="search__title">{"Let's search"}</p>
+        <input
+          className="search__input"
+          type="text"
+          placeholder="Search"
+          onChange={inputHandler}
+        />
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            {header.map((head) => (
+              <th key={head}>{t(head, { ns: url.split("/")[1] })}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((dat) => {
+            return (
+              <tr key={dat._id}>
+                {header.map((key) => {
+                  if (dat[key] != null && dat[key]["_id"] !== undefined) {
+                    return (
+                      // eslint-disable-next-line react/jsx-key
+                      <td key={key}>
+                        <Link href={`${key}/${dat[key]["_id"]}`}>
+                          {dat[key]["name"]}
+                        </Link>
+                      </td>
+                    );
+                  } else {
+                    return (
+                      // eslint-disable-next-line react/jsx-key
+                      <td key={key}>
+                        <Link href={`${url}/${dat._id}`}>{dat[key]}</Link>
+                      </td>
+                    );
+                  }
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default List;

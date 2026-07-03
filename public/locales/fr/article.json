@@ -11,5 +11,6 @@
   "historic": "Historique de l'article",
   "noHistorcic": "Pas d'historique",
   "delete": "Supprimer l'article",
-  "currentStock": "Stock actuel"
+  "currentStock": "Stock actuel",
+  "shop_required": "Veuillez choisir une boutique pour l'article"
 }

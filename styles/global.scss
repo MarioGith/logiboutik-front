@@ -296,7 +296,7 @@ input {
     transform-style: preserve-3d;
 
     &::placeholder {
-      color: color(#575756 a(0.8));
+      color: rgba(#575756, 0.8);
       text-transform: uppercase;
       letter-spacing: 1.5px;
     }

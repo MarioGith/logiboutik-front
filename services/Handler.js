@@ -50,4 +50,9 @@ Handler.getStock = async () => {
   return docs.data;
 };
 
+Handler.getBackup = async () => {
+  const docs = await APIHelper.get("/backup");
+  return docs.data;
+};
+
 export default Handler;

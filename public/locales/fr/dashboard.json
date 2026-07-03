@@ -1,1 +1,7 @@
-{ "total_sell": "Total vendu", "total_income": "Total de revenu" }
+{
+  "total_sell": "Total vendu",
+  "total_income": "Total de revenu",
+  "backup": "Sauvegarder les données",
+  "backup_running": "Sauvegarde en cours...",
+  "backup_success": "Sauvegarde téléchargée"
+}

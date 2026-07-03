@@ -102,7 +102,9 @@ const CreateIncome = () => {
     // Format data
     const incomeRowsMapped = listIncome.map((vente) => {
       return {
-        name: vente.name[0].toUpperCase() + vente.name.substring(1),
+        name: vente.name
+          ? vente.name[0].toUpperCase() + vente.name.substring(1)
+          : "",
         priceTtc: `${vente.price} €`,
         priceHt: `${(Math.round((vente.price / 1.2) * 100) / 100).toFixed(
           2

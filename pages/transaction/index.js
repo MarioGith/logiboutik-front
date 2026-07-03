@@ -27,7 +27,7 @@ const ListTransaction = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [t, transactions.length]);
+  }, [t]);
 
   if (!transactions) return <></>;
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import "jspdf-autotable";
 import { useTranslation } from "next-i18next";
+import { toast } from "react-toastify";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Handler } from "../../services";
 import { generatePDF } from "../../utils";
@@ -25,10 +26,13 @@ const CreateStock = () => {
       try {
         const listStock = await Handler.getStock();
         setStock(listStock);
-      } catch (err) {}
+      } catch (err) {
+        toast(err.message, { type: "error" });
+      } finally {
+        setLoaded(true);
+      }
     }
     loadData();
-    setLoaded(true);
   }, []);
 
   const clientOptions = state.client.map((client) => {
@@ -69,7 +73,9 @@ const CreateStock = () => {
     // Format data
     const stockRowsMapped = stock.map((article) => {
       return {
-        name: article.name[0].toUpperCase() + article.name.substring(1),
+        name: article.name
+          ? article.name[0].toUpperCase() + article.name.substring(1)
+          : "",
         priceTTC: `${article.price} €`,
         quantity: article.quantity,
         sellQuantity: 0,

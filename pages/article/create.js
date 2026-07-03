@@ -22,11 +22,19 @@ const CreateArticle = () => {
   }, []);
 
   const sendData = async () => {
-    const res = await Handler.create("article", newArticle);
-    if (res.status === 200) {
-      toast(res.data.message, { type: "success" });
-    } else {
-      toast(res.data.message, { type: "error" });
+    if (!newArticle.shop) {
+      toast(t("shop_required"), { type: "error" });
+      return;
+    }
+    try {
+      const res = await Handler.create("article", newArticle);
+      if (res.status === 200) {
+        toast(res.data.message, { type: "success" });
+      } else {
+        toast(res.data.message, { type: "error" });
+      }
+    } catch (err) {
+      toast(err?.response?.data?.message || err.message, { type: "error" });
     }
   };
 

@@ -10,7 +10,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 const EditArticle = () => {
   const { t } = useTranslation("article");
-  const { router, asPath } = useRouter();
+  const router = useRouter();
+  const { asPath } = router;
   const _id = asPath.split("/")[asPath.split("/").length - 1];
   const [newArticle, setNewArticle] = useState();
   const [options, setOptions] = useState([]);
@@ -26,7 +27,6 @@ const EditArticle = () => {
 
     Handler.get("article", _id)
       .then((res) => {
-        console.log(res);
         res.historic = res.historic.map((his) => {
           return {
             ...his,
@@ -41,7 +41,7 @@ const EditArticle = () => {
         setNewArticle(res.details);
       })
       .catch((err) => console.log(err));
-  }, [_id, t]);
+  }, [_id]);
 
   const deleteArticle = async () => {
     await Handler.delete("article", _id);

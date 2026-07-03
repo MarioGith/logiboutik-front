@@ -22,6 +22,7 @@ export const CompanyReducer = (state, action) => {
           ...state,
           client: [...state.client, action.value],
         };
+      return state;
     }
     case "remove_client": {
       return {
@@ -46,5 +47,7 @@ export const CompanyReducer = (state, action) => {
       localStorage.clear();
       return initialState;
     }
+    default:
+      return state;
   }
 };

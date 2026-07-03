@@ -8,7 +8,8 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 const EditShop = () => {
   const { t } = useTranslation(["shop", "common"]);
-  const { router, asPath } = useRouter();
+  const router = useRouter();
+  const { asPath } = router;
   const _id = asPath.split("/")[asPath.split("/").length - 1];
   const [newShop, setNewShop] = useState();
 
@@ -22,7 +23,7 @@ const EditShop = () => {
 
   const deleteShop = async () => {
     await Handler.delete("shop", _id);
-    router.push("/app/shop");
+    router.push("/shop");
   };
 
   const handleEdit = async () => {
@@ -30,7 +31,6 @@ const EditShop = () => {
       _id,
       name: newShop.name,
     });
-    console.log(res);
     if (res.status === 200) {
       toast("Edited", { type: "success" });
     } else {

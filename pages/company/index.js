@@ -14,8 +14,6 @@ const Company = () => {
     city: "",
   });
 
-  console.log(state.client);
-
   return (
     <>
       <div className="container">
