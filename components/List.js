@@ -60,7 +60,7 @@ const List = (props) => {
               return (
                 <tr key={dat._id}>
                   {header.map((key) => {
-                    if (dat[key]["_id"] !== undefined) {
+                    if (dat[key] != null && dat[key]["_id"] !== undefined) {
                       return (
                         // eslint-disable-next-line react/jsx-key
                         <td key={key}>
