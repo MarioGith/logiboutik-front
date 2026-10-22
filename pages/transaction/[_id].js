@@ -1,139 +1,100 @@
 import React, { useState, useEffect } from "react";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Select from "react-select";
-import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import Constants from "../../assets/Constants";
-import { Button } from "../../components";
+import { useTranslation } from "next-i18next";
 import { Handler } from "../../services";
-import { setForSelect } from "../../utils";
+import { Button, TransactionForm, checkTransaction } from "../../components";
+import {
+  setForSelect,
+  notifyError,
+  notifyInvalid,
+  notifySuccess,
+} from "../../utils";
+import { onDemandPaths, withTranslations } from "../../utils/i18n";
 
 const EditTransaction = () => {
   const { t } = useTranslation(["transaction", "common"]);
   const router = useRouter();
-  const { asPath } = router;
-  const _id = asPath.split("/")[asPath.split("/").length - 1];
-
-  const [newTransaction, setNewTransaction] = useState();
-  const [options, setOptions] = useState([]);
-
-  const { transactionOptions } = Constants;
+  const { _id } = router.query;
+  const [transaction, setTransaction] = useState(null);
+  const [articleOptions, setArticleOptions] = useState([]);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (!_id) return;
     Handler.list("article")
-      .then((res) => {
-        setOptions(setForSelect(res));
-      })
-      .catch((err) => console.log(err));
+      .then((res) => setArticleOptions(setForSelect(res)))
+      .catch((err) => notifyError(err, t));
+    // The API answers a one-element array.
     Handler.get("transaction", _id)
-      .then((res) => {
-        res = res.map((trans) => {
-          return {
-            ...trans,
-            date: `${trans.date.split("T")[0].split("-")[2]}/${
-              trans.date.split("T")[0].split("-")[1]
-            }/${trans.date.split("T")[0].split("-")[0]}`,
-            transaction_type: t(`${trans.transaction_type}`),
-          };
-        });
-        setNewTransaction(res[0]);
-      })
-      .catch((err) => console.log(err));
-  }, [_id]);
-
-  const deleteTransaction = async () => {
-    await Handler.delete("transaction", _id);
-    router.push("/transaction");
-  };
+      .then(([res]) =>
+        // Keep the raw values (type code, real Date): the form shows them
+        // translated and formatted, but saves them untouched.
+        setTransaction({
+          article: res.article,
+          quantity: res.quantity,
+          date: new Date(res.date),
+          transaction_type: res.transaction_type,
+        }),
+      )
+      .catch((err) => {
+        // Unknown or deleted id, or API down: back to the list.
+        notifyError(err, t);
+        router.replace("/transaction");
+      });
+  }, [_id, t, router]);
 
   const handleEdit = async () => {
-    const res = await Handler.update("transaction", _id, newTransaction);
-    if (res.status === 200) {
-      toast("Edited", { type: "success" });
-    } else {
-      toast(res.data.message, { type: "error" });
+    const problem = checkTransaction(transaction, t);
+    if (problem) {
+      notifyInvalid(problem);
+      return;
+    }
+    setSaving(true);
+    try {
+      await Handler.update("transaction", _id, transaction);
+      notifySuccess(t("saved", { ns: "common" }));
+    } catch (err) {
+      notifyError(err, t);
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (newTransaction == undefined) return <></>;
+  const deleteTransaction = async () => {
+    if (!window.confirm(t("confirm_delete", { ns: "common" }))) return;
+    try {
+      await Handler.delete("transaction", _id);
+      notifySuccess(t("deleted", { ns: "common" }));
+      router.push("/transaction");
+    } catch (err) {
+      notifyError(err, t);
+    }
+  };
+
+  if (!transaction) {
+    return <p className="status">{t("loading", { ns: "common" })}</p>;
+  }
 
   return (
     <div className="container">
       <div className="creation">
-        <label>{t("article")}</label>
-        <Select
-          options={options}
-          isClearable
-          placeholder={t("article_placeholder")}
-          className="select"
-          isSearchable
-          defaultValue={options.find(
-            (article) => article.value === newTransaction.article
-          )}
-          onChange={(e) => {
-            if (e) {
-              setNewTransaction({ ...newTransaction, article: e.value });
-            }
-          }}
-        />
-        <label>{t("quantity")}</label>
-        <input
-          value={newTransaction.quantity}
-          onChange={(e) => {
-            setNewTransaction({
-              ...newTransaction,
-              quantity: e.target.value,
-            });
-          }}
-        />
-        <label>{t("date")}</label>
-        <input value={newTransaction.date} disabled />
-
-        <label>{t("transaction_type")}</label>
-        <Select
-          options={transactionOptions}
-          isClearable
-          placeholder={t("transaction_type_placeholder")}
-          className="select"
-          isSearchable
-          defaultValue={transactionOptions.find(
-            (transactionOption) =>
-              t(`${transactionOption.value}`) ===
-              newTransaction.transaction_type
-          )}
-          onChange={(e) => {
-            if (e) {
-              setNewTransaction({
-                ...newTransaction,
-                transaction_type: e.value,
-              });
-            }
-          }}
+        <TransactionForm
+          transaction={transaction}
+          articleOptions={articleOptions}
+          onChange={setTransaction}
         />
       </div>
       <Button
-        onClick={() => handleEdit()}
+        onClick={handleEdit}
+        disabled={saving}
         label={t("modify", { ns: "common" })}
       />
-      <Button onClick={() => deleteTransaction()} label={t("delete")} warning />
+      <Button onClick={deleteTransaction} label={t("delete")} warning />
     </div>
   );
 };
 
 export default EditTransaction;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["transaction", "common"])),
-    },
-  };
-}
-
-export const getStaticPaths = async () => {
-  return {
-    paths: [], //indicates that no page needs be created at build time
-    fallback: "blocking", //indicates the type of fallback
-  };
-};
+export const getStaticProps = withTranslations(["transaction"]);
+export const getStaticPaths = onDemandPaths;

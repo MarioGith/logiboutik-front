@@ -1,88 +1,77 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "next-i18next";
 import { Handler } from "../services";
 import { Button } from "../components";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { toast } from "react-toastify";
-import { useTranslation } from "next-i18next";
+import { formatPrice, notifyError, notifySuccess } from "../utils";
+import { withTranslations } from "../utils/i18n";
+
+function downloadJson(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 const Dashboard = () => {
-  const { t } = useTranslation("dashboard");
-  const [loaded, setLoaded] = useState(false);
-  const [totalSell, setTotalSell] = useState(0);
-  const [totalIncome, setTotalIncome] = useState(0);
+  const { t } = useTranslation(["dashboard", "common"]);
+  const [totals, setTotals] = useState(null);
   const [backingUp, setBackingUp] = useState(false);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const income = await Handler.getTotalIncome("dashboard");
-        const sell = await Handler.getTotalSell("dashboard");
-        setTotalIncome(income);
-        setTotalSell(sell);
-        setLoaded(true);
-      } catch (err) {
-        toast(err.message, { type: "error" });
-      }
-    }
-    loadData();
-  }, []);
+    Promise.all([
+      Handler.getTotalSell("dashboard"),
+      Handler.getTotalIncome("dashboard"),
+    ])
+      .then(([sell, income]) => setTotals({ sell, income }))
+      .catch((err) => notifyError(err, t));
+  }, [t]);
 
   const handleBackup = async () => {
     setBackingUp(true);
     try {
-      const backup = await Handler.getBackup();
-      const blob = new Blob([JSON.stringify(backup, null, 2)], {
-        type: "application/json",
-      });
-      const stamp = new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace(/:/g, "-");
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `logiboutik-backup-${stamp}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast(t("backup_success"), { type: "success" });
+      const stamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+      downloadJson(
+        await Handler.getBackup(),
+        `logiboutik-backup-${stamp}.json`,
+      );
+      notifySuccess(t("backup_success"));
     } catch (err) {
-      toast(err.message, { type: "error" });
+      notifyError(err, t);
     } finally {
       setBackingUp(false);
     }
   };
 
-  if (loaded) {
-    return (
-      <div className="container">
+  return (
+    <div className="container">
+      {totals ? (
         <div>
           <h2>
-            {t("total_sell")} : {totalSell}
+            {t("total_sell")} : {totals.sell}
           </h2>
           <h2>
-            {t("total_income")} : {totalIncome.toFixed(2)} €
+            {t("total_income")} : {formatPrice(totals.income)}
           </h2>
         </div>
-        <Button
-          onClick={handleBackup}
-          label={backingUp ? t("backup_running") : t("backup")}
-        />
-      </div>
-    );
-  }
-
-  return <div className="loader"></div>;
+      ) : (
+        <p className="status">{t("loading", { ns: "common" })}</p>
+      )}
+      <Button
+        onClick={handleBackup}
+        disabled={backingUp}
+        label={backingUp ? t("backup_running") : t("backup")}
+      />
+    </div>
+  );
 };
 
 export default Dashboard;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["dashboard"])),
-      // Will be passed to the page component as props
-    },
-  };
-}
+export const getStaticProps = withTranslations(["dashboard"]);

@@ -1,37 +1,40 @@
 import {
   useEffect,
   useReducer,
+  useState,
   createContext,
   useContext,
   useMemo,
 } from "react";
 import { CompanyReducer, initialState } from "./CompanyReducer";
 
+const STORAGE_KEY = "state";
 const CompanyContext = createContext();
+
+function readStoredState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY));
+  } catch {
+    return null;
+  }
+}
 
 export function CompanyWrapper({ children }) {
   const [state, dispatch] = useReducer(CompanyReducer, initialState);
-  const contextValue = useMemo(() => {
-    return { state, dispatch };
-  }, [state, dispatch]);
+  const [loaded, setLoaded] = useState(false);
+  const contextValue = useMemo(() => ({ state, dispatch }), [state]);
 
+  // Load what was saved in this browser, once.
   useEffect(() => {
-    if (JSON.parse(localStorage.getItem("state"))) {
-      //checking if there already is a state in localstorage
-      //if yes, update the current state with the stored one
-      dispatch({
-        type: "init_stored",
-        value: JSON.parse(localStorage.getItem("state")),
-      });
-    }
-  }, [dispatch]);
-  useEffect(() => {
-    if (state !== initialState) {
-      localStorage.setItem("state", JSON.stringify(state));
+    const stored = readStoredState();
+    if (stored) dispatch({ type: "init_stored", value: stored });
+    setLoaded(true);
+  }, []);
 
-      //create and/or set a new localstorage variable called "state"
-    }
-  }, [state]);
+  // Save every change (only after loading, not to overwrite saved data).
+  useEffect(() => {
+    if (loaded) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state, loaded]);
 
   return (
     <CompanyContext.Provider value={contextValue}>
@@ -39,6 +42,7 @@ export function CompanyWrapper({ children }) {
     </CompanyContext.Provider>
   );
 }
+
 export function useCompanyContext() {
   return useContext(CompanyContext);
 }

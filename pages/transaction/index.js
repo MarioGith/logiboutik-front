@@ -3,33 +3,46 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { List, Button } from "../../components";
 import { Handler } from "../../services";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { formatDate, notifyError } from "../../utils";
+import { withTranslations } from "../../utils/i18n";
 
 const ListTransaction = () => {
-  const { t } = useTranslation("transaction");
+  const { t } = useTranslation(["transaction", "common"]);
   const router = useRouter();
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState(null);
 
   useEffect(() => {
     Handler.list("transaction")
-      .then((res) => {
-        res = res.map((trans) => {
-          return {
+      .then((res) =>
+        setTransactions(
+          res.map((trans) => ({
             ...trans,
-            date: `${trans.date.split("T")[0].split("-")[2]}/${
-              trans.date.split("T")[0].split("-")[1]
-            }/${trans.date.split("T")[0].split("-")[0]}`,
-            transaction_type: t(`${trans.transaction_type}`),
-          };
-        });
-        setTransactions(res);
-      })
+            date: formatDate(trans.date),
+            transaction_type: t(trans.transaction_type),
+          })),
+        ),
+      )
       .catch((err) => {
-        console.log(err);
+        setTransactions([]);
+        notifyError(err, t);
       });
   }, [t]);
 
-  if (!transactions) return <></>;
+  const toTransaction = (row) => `/transaction/${row._id}`;
+  const columns = [
+    {
+      key: "article",
+      label: t("article"),
+      link: (row) => row.article && `/article/${row.article._id}`,
+    },
+    { key: "date", label: t("date"), link: toTransaction },
+    { key: "quantity", label: t("quantity"), link: toTransaction },
+    {
+      key: "transaction_type",
+      label: t("transaction_type"),
+      link: toTransaction,
+    },
+  ];
 
   return (
     <div className="container">
@@ -38,17 +51,11 @@ const ListTransaction = () => {
         onClick={() => router.push("/transaction/create")}
         label={t("create")}
       />
-      <List data={transactions} url="/transaction" />
+      <List data={transactions} columns={columns} loading={!transactions} />
     </div>
   );
 };
 
 export default ListTransaction;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["transaction"])),
-    },
-  };
-}
+export const getStaticProps = withTranslations(["transaction"]);

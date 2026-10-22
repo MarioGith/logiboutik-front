@@ -3,5 +3,8 @@
   "create": "Créer une boutique",
   "name": "Nom de la boutique",
   "delete": "Supprimer la boutique",
-  "list": "Liste des boutiques"
+  "list": "Liste des boutiques",
+  "articles": "Articles de la boutique",
+  "name_required": "Veuillez indiquer le nom de la boutique",
+  "created": "Boutique créée"
 }

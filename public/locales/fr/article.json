@@ -3,14 +3,15 @@
   "list": "Liste des articles",
   "create": "Créer un article",
   "name": "Nom de l'article",
-  "price": "Prix de l'article",
-  "quantity": "Stock actuel",
+  "price": "Prix de l'article (TTC)",
   "shop_placeholder": "Choisir une boutique",
   "shop": "Boutique de l'article",
-  "shopId": "Id de la boutique de l'article",
-  "historic": "Historique de l'article",
-  "noHistorcic": "Pas d'historique",
   "delete": "Supprimer l'article",
+  "confirm_delete": "Supprimer cet article ET tout son historique de transactions ? Cette action est irréversible.",
   "currentStock": "Stock actuel",
-  "shop_required": "Veuillez choisir une boutique pour l'article"
+  "historic": "Historique de l'article",
+  "name_required": "Veuillez indiquer le nom de l'article",
+  "price_required": "Veuillez indiquer un prix valide",
+  "shop_required": "Veuillez choisir une boutique pour l'article",
+  "created": "Article créé"
 }

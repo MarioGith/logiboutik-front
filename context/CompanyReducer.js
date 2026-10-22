@@ -1,52 +1,41 @@
+// Company details and client list, saved in the browser (localStorage).
 export const initialState = {
   name: "",
-  adress: "",
+  adress: "", // historical spelling, kept so existing saved data still loads
   phone: "",
   website: "",
-  client: [],
+  client: [], // [{ name, address, city }]
 };
+
+const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
 
 export const CompanyReducer = (state, action) => {
   switch (action.type) {
-    case "init_stored": {
-      return action.value;
-    }
+    // Data saved by any older version is completed with the missing fields.
+    case "init_stored":
+      return { ...initialState, ...action.value };
+
+    // Only the company fields: the client list is left untouched.
     case "modify_company": {
-      return {
-        ...action.value,
-      };
-    }
-    case "add_client": {
-      if (!state.client.includes(action.value))
-        return {
-          ...state,
-          client: [...state.client, action.value],
-        };
-      return state;
-    }
-    case "remove_client": {
-      return {
-        ...state,
-        client: state.client.filter((item) => item !== action.value),
-      };
+      const { name, adress, phone, website } = action.value;
+      return { ...state, name, adress, phone, website };
     }
 
-    case "modify_client": {
+    case "add_client":
+      if (state.client.some((c) => sameName(c.name, action.value.name))) {
+        return state;
+      }
+      return { ...state, client: [...state.client, action.value] };
+
+    case "remove_client":
       return {
         ...state,
-        client: state.client.map((item) => {
-          if (item === action.value.old) {
-            return action.value.new;
-          }
-          return item;
-        }),
+        client: state.client.filter((c) => !sameName(c.name, action.value)),
       };
-    }
 
-    case "reset": {
-      localStorage.clear();
+    case "reset":
       return initialState;
-    }
+
     default:
       return state;
   }

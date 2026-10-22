@@ -1,12 +1,20 @@
 {
-  "info": "Infomartion sur l'entreprise",
+  "info": "Information sur l'entreprise",
   "name": "Nom de l'entreprise",
   "address": "Adresse de l'entreprise",
   "phone": "Téléphone de l'entreprise",
   "website": "Site web de l'entreprise",
-  "client": "Client",
+  "client": "Clients",
+  "client_add": "Ajouter un client",
   "client_name": "Nom du client",
   "client_address": "Adresse du client",
   "client_city": "Ville du client",
-  "reset": "Réinitialiser les données de l'entreprise"
+  "client_name_required": "Veuillez indiquer le nom du client",
+  "client_exists": "Un client porte déjà ce nom",
+  "client_added": "Client ajouté",
+  "client_remove": "Retirer",
+  "no_client": "Aucun client pour l'instant",
+  "saved_locally": "Ces informations sont enregistrées dans ce navigateur uniquement.",
+  "reset": "Réinitialiser les données de l'entreprise",
+  "confirm_reset": "Effacer les informations de l'entreprise et tous les clients de ce navigateur ?"
 }

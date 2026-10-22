@@ -1,3 +1,4 @@
+// ----------- Reset -----------
 html,
 body,
 div,
@@ -42,10 +43,6 @@ section {
   display: block;
 }
 
-body {
-  line-height: 1;
-}
-
 ol,
 ul {
   list-style: none;
@@ -56,6 +53,11 @@ table {
   border-spacing: 0;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+// ----------- Base -----------
 :root {
   font-size: var(--fs-base);
 }
@@ -63,15 +65,19 @@ table {
 html,
 body {
   font-family: var(--font-body);
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+body {
+  line-height: 1;
+  width: 100%;
+  min-height: 100%;
 }
 
 a {
   color: var(--color-link);
   text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
 }
 
 h1,
@@ -105,28 +111,30 @@ span {
   font-size: var(--fs-normal);
   line-height: var(--lh-normal);
   letter-spacing: var(--ls-normal);
-  margin-bottom: var(--spacing-2);
+  margin-bottom: var(--p-mb);
 }
 
-// ----------- General -----------
-body {
-  padding-top: var(--header-size);
-  width: 100%;
-  height: 100%;
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
+// ----------- Header -----------
 header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
+  z-index: 10;
   width: 100%;
   padding: 30px 100px;
+  margin-bottom: 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   font-family: var(--font-header);
   font-weight: var(--header-weight);
-  background-color: var(--white);
+  background-color: var(--color-background);
 
   .logo {
     color: var(--color-header);
@@ -137,6 +145,7 @@ header {
 
   ul {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
 
@@ -155,65 +164,126 @@ header {
 
       a:hover,
       .header-active {
-        background: var(--color-button-hover);
-        color: #000;
+        background: var(--color-accent);
+        color: var(--color-text);
       }
     }
   }
 }
 
+@media (max-width: 900px) {
+  header {
+    padding: 15px 16px;
+    justify-content: center;
+
+    ul li {
+      margin: 6px 4px;
+    }
+  }
+}
+
+// ----------- Layout -----------
 .container {
   margin: 20px;
   display: flex;
   flex-direction: column;
 }
 
+.status {
+  text-align: center;
+  margin: 20px;
+}
+
+// ----------- Forms -----------
 .creation {
-  background-color: #f2f2f2;
+  background-color: var(--color-surface);
   padding: 20px;
 
   input,
-  .select {
+  .select,
+  .react-datepicker-wrapper {
     width: 100%;
-    margin: 8px 0;
+    margin: 8px 0 30px;
     display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 30px;
+    border-radius: var(--radius);
     font-size: 1.6rem;
   }
 
+  input {
+    border: 1px solid var(--color-input-border);
+  }
+
   label {
+    display: block;
     font-size: 1.6rem;
     font-weight: bold;
   }
 }
 
-button {
-  margin-top: 10px;
-  padding: 8px 18px;
-  border-radius: var(--radius-lg);
-  font-weight: bold;
-  color: var(--white);
-  background: var(--color-link);
-  width: 100%;
-}
-
-button:hover {
-  background: var(--color-button-hover);
-  transition: all 0.3s ease;
-}
-
 input {
   width: 100%;
   padding: 12px 20px;
-
   margin-bottom: 15px;
 }
+
+input:disabled {
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: bold;
+  font-size: 1.4rem;
+  color: var(--white);
+  background: var(--color-link);
+  width: 100%;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--color-button-hover);
+  color: var(--color-text);
+  transition: all 0.3s ease;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+button.button--danger {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+
+// ----------- Company / clients -----------
+.clients {
+  margin: 0 0 20px;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 1.6rem;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  button {
+    width: auto;
+    margin: 0;
+  }
+}
+
 // ----------- List -----------
 .list {
   margin-top: 20px;
+  overflow-x: auto;
 
   table {
     width: 100%;
@@ -221,29 +291,24 @@ input {
     margin: 25px 0;
     font-size: 0.9em;
     font-family: sans-serif;
-    min-width: 400px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-  }
-
-  tbody tr {
-    border-bottom: 1px solid #dddddd;
+    box-shadow: var(--box-shadow);
   }
 
   td,
   th {
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--color-border-light);
     padding: 12px 15px;
   }
 
   th {
-    background-color: #fecc09;
-    color: black;
+    background-color: var(--color-accent);
+    color: var(--color-text);
     font-size: 1.6em;
   }
 
   tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: var(--color-surface);
   }
 
   td {
@@ -255,18 +320,19 @@ input {
     height: 100%;
     display: block;
     text-decoration: none;
-    color: black;
+    color: var(--color-text);
   }
 }
 
 // ----------- Search Bar -----------
 .search {
   &__container {
-    padding-top: 64px;
+    padding-top: 24px;
     margin: 0 50px;
   }
 
   &__title {
+    display: block;
     font-size: 22px;
     font-weight: 900;
     text-align: center;
@@ -275,28 +341,20 @@ input {
   &__input {
     width: 100%;
     padding: 12px 24px;
-
-    background-color: transparent;
-    transition: transform 250ms ease-in-out;
     font-size: 14px;
     line-height: 18px;
-
-    color: #575756;
+    color: var(--color-text-muted);
     background-color: transparent;
-    /*         background-image: url(http://mihaeltomic.com/codepen/input-search/ic_search_black_24px.svg); */
-
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-size: 18px 18px;
     background-position: 95% center;
     border-radius: 50px;
-    border: 1px solid #575756;
+    border: 1px solid var(--color-text-muted);
     transition: all 250ms ease-in-out;
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
 
     &::placeholder {
-      color: rgba(#575756, 0.8);
+      color: var(--color-text-muted);
       text-transform: uppercase;
       letter-spacing: 1.5px;
     }
@@ -304,11 +362,20 @@ input {
     &:hover,
     &:focus {
       padding: 12px 0;
-      outline: 0;
       border: 1px solid transparent;
-      border-bottom: 1px solid #575756;
+      border-bottom: 1px solid var(--color-text-muted);
       border-radius: 0;
       background-position: 100% center;
     }
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 10px;
+  }
+
+  .search__container {
+    margin: 0;
   }
 }

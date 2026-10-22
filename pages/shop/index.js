@@ -3,38 +3,38 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { List, Button } from "../../components";
 import { Handler } from "../../services";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { capitalize, notifyError } from "../../utils";
+import { withTranslations } from "../../utils/i18n";
 
 const ListShop = () => {
-  const { t } = useTranslation("shop");
+  const { t } = useTranslation(["shop", "common"]);
   const router = useRouter();
-  const [shops, setShops] = useState([]);
+  const [shops, setShops] = useState(null);
 
   useEffect(() => {
     Handler.list("shop")
-      .then((res) => {
-        setShops(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+      .then((res) =>
+        setShops(res.map((shop) => ({ ...shop, name: capitalize(shop.name) }))),
+      )
+      .catch((err) => {
+        setShops([]);
+        notifyError(err, t);
+      });
+  }, [t]);
 
-  if (!shops) return <></>;
+  const columns = [
+    { key: "name", label: t("name"), link: (row) => `/shop/${row._id}` },
+  ];
 
   return (
     <div className="container">
       <h3>{t("list")}</h3>
       <Button onClick={() => router.push("/shop/create")} label={t("create")} />
-      <List data={shops} url="/shop" />
+      <List data={shops} columns={columns} loading={!shops} />
     </div>
   );
 };
 
 export default ListShop;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["shop"])),
-    },
-  };
-}
+export const getStaticProps = withTranslations(["shop"]);

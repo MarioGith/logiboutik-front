@@ -1,110 +1,148 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useCompanyContext } from "../../context/CompanyContext";
 import { Button } from "../../components";
+import { capitalize, notifyInvalid, notifySuccess } from "../../utils";
+import { withTranslations } from "../../utils/i18n";
+
+const EMPTY_CLIENT = { name: "", address: "", city: "" };
+
+const Field = ({ id, label, value, onChange }) => (
+  <>
+    <label htmlFor={id}>{label}</label>
+    <input
+      id={id}
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value)}
+      type="text"
+    />
+  </>
+);
 
 const Company = () => {
   const { state, dispatch } = useCompanyContext();
   const { t } = useTranslation(["company", "common"]);
   const [company, setCompany] = useState(state);
-  const [client, setClient] = useState({
-    name: "",
-    address: "",
-    city: "",
-  });
+  const [client, setClient] = useState(EMPTY_CLIENT);
+
+  // The saved data is read after the first render: copy it into the form.
+  useEffect(() => {
+    setCompany(state);
+  }, [state.name, state.adress, state.phone, state.website]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const saveCompany = () => {
+    dispatch({ type: "modify_company", value: company });
+    notifySuccess(t("saved", { ns: "common" }));
+  };
+
+  const addClient = () => {
+    const name = client.name.trim();
+    if (!name) {
+      notifyInvalid(t("client_name_required"));
+      return;
+    }
+    if (
+      state.client.some(
+        (c) => c.name.trim().toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      notifyInvalid(t("client_exists"));
+      return;
+    }
+    dispatch({ type: "add_client", value: { ...client, name } });
+    setClient(EMPTY_CLIENT);
+    notifySuccess(t("client_added"));
+  };
+
+  const removeClient = (name) => {
+    if (window.confirm(t("confirm_delete", { ns: "common" }))) {
+      dispatch({ type: "remove_client", value: name });
+    }
+  };
+
+  const reset = () => {
+    if (window.confirm(t("confirm_reset"))) dispatch({ type: "reset" });
+  };
 
   return (
     <>
       <div className="container">
         <h3>{t("info")}</h3>
+        <p className="status">{t("saved_locally")}</p>
         <div className="creation">
-          <label>{t("name")}</label>
-          <input
+          <Field
+            id="company-name"
+            label={t("name")}
             value={company.name}
-            onChange={(e) => {
-              setCompany({ ...company, name: e.target.value });
-            }}
-            type="text"
+            onChange={(name) => setCompany({ ...company, name })}
           />
-
-          <label>{t("address")}</label>
-          <input
+          <Field
+            id="company-address"
+            label={t("address")}
             value={company.adress}
-            onChange={(e) => {
-              setCompany({ ...company, adress: e.target.value });
-            }}
-            type="text"
+            onChange={(adress) => setCompany({ ...company, adress })}
           />
-          <label>{t("phone")}</label>
-          <input
+          <Field
+            id="company-phone"
+            label={t("phone")}
             value={company.phone}
-            onChange={(e) => {
-              setCompany({ ...company, phone: e.target.value });
-            }}
-            type="text"
+            onChange={(phone) => setCompany({ ...company, phone })}
           />
-          <label>{t("website")}</label>
-          <input
+          <Field
+            id="company-website"
+            label={t("website")}
             value={company.website}
-            onChange={(e) => {
-              setCompany({ ...company, website: e.target.value });
-            }}
-            type="text"
+            onChange={(website) => setCompany({ ...company, website })}
           />
         </div>
-        <button
-          onClick={() => dispatch({ type: "modify_company", value: company })}
-          type="button"
-        >
-          {t("save", { ns: "common" })}
-        </button>
+        <Button onClick={saveCompany} label={t("save", { ns: "common" })} />
       </div>
 
       <div className="container">
         <h3>{t("client")}</h3>
-        {/* <List data={state.client} url="/company" /> */}
+        {state.client.length === 0 ? (
+          <p className="status">{t("no_client")}</p>
+        ) : (
+          <ul className="clients">
+            {state.client.map((c, index) => (
+              <li key={`${c.name}-${index}`}>
+                <span>
+                  {capitalize(c.name)}
+                  {c.city ? ` — ${c.city}` : ""}
+                </span>
+                <Button
+                  onClick={() => removeClient(c.name)}
+                  label={t("client_remove")}
+                  warning
+                />
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className="creation">
-          <label>{t("client_name")}</label>
-          <input
+          <Field
+            id="client-name"
+            label={t("client_name")}
             value={client.name}
-            onChange={(e) => {
-              setClient({ ...client, name: e.target.value });
-            }}
-            type="text"
+            onChange={(name) => setClient({ ...client, name })}
           />
-
-          <label>{t("client_address")}</label>
-          <input
+          <Field
+            id="client-address"
+            label={t("client_address")}
             value={client.address}
-            onChange={(e) => {
-              setClient({ ...client, address: e.target.value });
-            }}
-            type="text"
+            onChange={(address) => setClient({ ...client, address })}
           />
-
-          <label>{t("client_city")}</label>
-          <input
+          <Field
+            id="client-city"
+            label={t("client_city")}
             value={client.city}
-            onChange={(e) => {
-              setClient({ ...client, city: e.target.value });
-            }}
-            type="text"
+            onChange={(city) => setClient({ ...client, city })}
           />
         </div>
-        <button
-          onClick={() => dispatch({ type: "add_client", value: client })}
-          type="button"
-        >
-          {t("save", { ns: "common" })}
-        </button>
+        <Button onClick={addClient} label={t("client_add")} />
 
-        <Button
-          onClick={() => dispatch({ type: "reset" })}
-          warning
-          label={t("reset")}
-        />
+        <Button onClick={reset} warning label={t("reset")} />
       </div>
     </>
   );
@@ -112,10 +150,4 @@ const Company = () => {
 
 export default Company;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["company", "common"])),
-    },
-  };
-}
+export const getStaticProps = withTranslations(["company"]);
