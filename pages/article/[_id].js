@@ -1,135 +1,129 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import { setForSelect } from "../../utils";
-import { List, Button } from "../../components";
 import { Handler } from "../../services";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { ArticleForm, Button, List, checkArticle } from "../../components";
+import {
+  formatDate,
+  notifyError,
+  notifyInvalid,
+  notifySuccess,
+  setForSelect,
+} from "../../utils";
+import { onDemandPaths, withTranslations } from "../../utils/i18n";
 
 const EditArticle = () => {
-  const { t } = useTranslation("article");
+  const { t } = useTranslation(["article", "transaction", "common"]);
   const router = useRouter();
-  const { asPath } = router;
-  const _id = asPath.split("/")[asPath.split("/").length - 1];
-  const [newArticle, setNewArticle] = useState();
-  const [options, setOptions] = useState([]);
+  const { _id } = router.query;
+  const [article, setArticle] = useState(null);
+  const [shopOptions, setShopOptions] = useState([]);
   const [historic, setHistoric] = useState([]);
   const [stock, setStock] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    if (!_id) return;
     Handler.list("shop")
-      .then((res) => {
-        setOptions(setForSelect(res));
-      })
-      .catch((err) => console.log(err));
-
+      .then((res) => setShopOptions(setForSelect(res)))
+      .catch((err) => notifyError(err, t));
     Handler.get("article", _id)
       .then((res) => {
-        res.historic = res.historic.map((his) => {
-          return {
-            ...his,
-            date: `${his.date.split("T")[0].split("-")[2]}/${
-              his.date.split("T")[0].split("-")[1]
-            }/${his.date.split("T")[0].split("-")[0]}`,
-            transaction_type: t(`transaction.${his.transaction_type}`),
-          };
+        setArticle({
+          name: res.details.name,
+          price: res.details.price,
+          shop: res.details.shop,
         });
-        setHistoric(res.historic);
         setStock(res.stock);
-        setNewArticle(res.details);
+        setHistoric(
+          res.historic.map((his) => ({
+            ...his,
+            date: formatDate(his.date),
+            transaction_type: t(his.transaction_type, { ns: "transaction" }),
+          })),
+        );
       })
-      .catch((err) => console.log(err));
-  }, [_id]);
-
-  const deleteArticle = async () => {
-    await Handler.delete("article", _id);
-    router.push("/article");
-  };
+      .catch((err) => {
+        // Unknown or deleted id, or API down: back to the list.
+        notifyError(err, t);
+        router.replace("/article");
+      });
+  }, [_id, t, router]);
 
   const handleEdit = async () => {
-    const res = await Handler.update("article", _id, newArticle);
-    if (res.status === 200) {
-      toast("Edited", { type: "success" });
-    } else {
-      toast(res.data.message, { type: "error" });
+    const problem = checkArticle(article, t);
+    if (problem) {
+      notifyInvalid(problem);
+      return;
+    }
+    setSaving(true);
+    try {
+      await Handler.update("article", _id, article);
+      notifySuccess(t("saved", { ns: "common" }));
+    } catch (err) {
+      notifyError(err, t);
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (!newArticle) return <></>;
+  const deleteArticle = async () => {
+    if (!window.confirm(t("confirm_delete"))) return;
+    try {
+      await Handler.delete("article", _id);
+      notifySuccess(t("deleted", { ns: "common" }));
+      router.push("/article");
+    } catch (err) {
+      notifyError(err, t);
+    }
+  };
+
+  if (!article)
+    return <p className="status">{t("loading", { ns: "common" })}</p>;
+
+  const toTransaction = (row) => `/transaction/${row._id}`;
+  const columns = [
+    {
+      key: "date",
+      label: t("date", { ns: "transaction" }),
+      link: toTransaction,
+    },
+    {
+      key: "transaction_type",
+      label: t("transaction_type", { ns: "transaction" }),
+      link: toTransaction,
+    },
+    {
+      key: "quantity",
+      label: t("quantity", { ns: "transaction" }),
+      link: toTransaction,
+    },
+  ];
 
   return (
     <div className="container">
-      <div className="details">
-        <div className="creation">
-          <label>{t("currentStock")}</label>
-          <input value={stock} disabled type="text" />
-
-          <label>{t("name")}</label>
-          <input
-            value={newArticle.name}
-            onChange={(e) => {
-              setNewArticle({
-                ...newArticle,
-                name: e.target.value.toLowerCase(),
-              });
-            }}
-            type="text"
-          />
-
-          <label>{t("price")}</label>
-          <input
-            value={newArticle.price}
-            onChange={(e) => {
-              setNewArticle({ ...newArticle, price: e.target.value });
-            }}
-          />
-          <label>{t("shop")}</label>
-          <Select
-            options={options}
-            isClearable
-            placeholder={t("shop_placeholder")}
-            defaultValue={options.find(
-              (shop) => shop.value === newArticle.shop
-            )}
-            isSearchable
-            className="select"
-            onChange={(e) => {
-              if (e) {
-                setNewArticle({ ...newArticle, shop: e.value });
-              }
-            }}
-          />
-        </div>
-        <Button
-          onClick={() => handleEdit()}
-          label={t("modify", { ns: "common" })}
+      <div className="creation">
+        <label htmlFor="stock">{t("currentStock")}</label>
+        <input id="stock" value={stock} disabled type="text" />
+        <ArticleForm
+          article={article}
+          shopOptions={shopOptions}
+          onChange={setArticle}
         />
-        <Button onClick={() => deleteArticle()} label={t("delete")} warning />
       </div>
-      <List data={historic} url="/transaction" />
+      <Button
+        onClick={handleEdit}
+        disabled={saving}
+        label={t("modify", { ns: "common" })}
+      />
+      <Button onClick={deleteArticle} label={t("delete")} warning />
+      <h3>{t("historic")}</h3>
+      <List data={historic} columns={columns} />
     </div>
   );
 };
 
 export default EditArticle;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, [
-        "article",
-        "transaction",
-        "common",
-      ])),
-    },
-  };
-}
-
-export const getStaticPaths = async () => {
-  return {
-    paths: [], //indicates that no page needs be created at build time
-    fallback: "blocking", //indicates the type of fallback
-  };
-};
+export const getStaticProps = withTranslations(["article", "transaction"]);
+export const getStaticPaths = onDemandPaths;

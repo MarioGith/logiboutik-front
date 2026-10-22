@@ -1,40 +1,43 @@
 import React, { useState, useEffect } from "react";
-import Select from "react-select";
-import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { Handler } from "../../services";
-import { setForSelect } from "../../utils";
-import { Button } from "../../components";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {
+  setForSelect,
+  notifyError,
+  notifyInvalid,
+  notifySuccess,
+} from "../../utils";
+import { ArticleForm, Button, checkArticle } from "../../components";
+import { withTranslations } from "../../utils/i18n";
 
 const CreateArticle = () => {
-  const { t } = useTranslation("article");
-  const [options, setOptions] = useState([]);
-
-  const [newArticle, setNewArticle] = useState({});
+  const { t } = useTranslation(["article", "common"]);
+  const router = useRouter();
+  const [shopOptions, setShopOptions] = useState([]);
+  const [article, setArticle] = useState({ name: "", price: "", shop: "" });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     Handler.list("shop")
-      .then((res) => {
-        setOptions(setForSelect(res));
-      })
-      .catch((err) => console.log(err));
-  }, []);
+      .then((res) => setShopOptions(setForSelect(res)))
+      .catch((err) => notifyError(err, t));
+  }, [t]);
 
   const sendData = async () => {
-    if (!newArticle.shop) {
-      toast(t("shop_required"), { type: "error" });
+    const problem = checkArticle(article, t);
+    if (problem) {
+      notifyInvalid(problem);
       return;
     }
+    setSaving(true);
     try {
-      const res = await Handler.create("article", newArticle);
-      if (res.status === 200) {
-        toast(res.data.message, { type: "success" });
-      } else {
-        toast(res.data.message, { type: "error" });
-      }
+      await Handler.create("article", article);
+      notifySuccess(t("created"));
+      router.push("/article");
     } catch (err) {
-      toast(err?.response?.data?.message || err.message, { type: "error" });
+      notifyError(err, t);
+      setSaving(false);
     }
   };
 
@@ -42,52 +45,23 @@ const CreateArticle = () => {
     <div className="container">
       <h3>{t("create")}</h3>
       <div className="creation">
-        <label>{t("name")}</label>
-        <input
-          value={newArticle.name}
-          onChange={(e) => {
-            setNewArticle({
-              ...newArticle,
-              name: e.target.value.toLowerCase(),
-            });
-          }}
-          type="text"
+        <ArticleForm
+          article={article}
+          shopOptions={shopOptions}
+          onChange={setArticle}
         />
-
-        <label>{t("price")}</label>
-        <input
-          value={newArticle.price}
-          onChange={(e) => {
-            setNewArticle({ ...newArticle, price: e.target.value });
-          }}
-        />
-        <label>{t("shop")}</label>
-        <Select
-          options={options}
-          isClearable
-          placeholder={t("shop_placeholder")}
-          isSearchable
-          className="select"
-          onChange={(e) => {
-            if (e) {
-              setNewArticle({ ...newArticle, shop: e.value });
-            } else {
-              setNewArticle({ ...newArticle, shop: "" });
-            }
-          }}
-        />
-        <Button label={t("save")} onClick={() => sendData()} />
       </div>
+      <Button
+        label={
+          saving ? t("saving", { ns: "common" }) : t("save", { ns: "common" })
+        }
+        disabled={saving}
+        onClick={sendData}
+      />
     </div>
   );
 };
 
 export default CreateArticle;
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["article"])),
-    },
-  };
-}
+export const getStaticProps = withTranslations(["article"]);

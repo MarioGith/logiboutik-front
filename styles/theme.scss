@@ -1,12 +1,24 @@
 // ----------- Constantes -----------
+// Every color used by the app is defined here. Components and pages must use
+// these variables, never a raw color value.
 :root {
   /* COLORS */
   --color-primary: #6fb2e0;
   --color-header: #333333;
   --color-link: #8888ee;
-  ---color-border: rgba(0, 0, 0, 0.25);
-  --color-button-hover: #fecc09;
-  --white: white;
+  --color-accent: #fecc09; // yellow: active menu, table header, hover
+  --color-text: #000000;
+  --color-text-muted: #575756;
+  --color-background: #ffffff;
+  --color-surface: #f2f2f2; // form and even table rows background
+  --color-border: rgba(0, 0, 0, 0.25);
+  --color-border-light: #dddddd;
+  --color-input-border: #cccccc;
+  --color-danger: #d93025;
+  --color-on-danger: #ffffff;
+  --color-shadow: rgba(0, 0, 0, 0.15);
+  --color-button-hover: var(--color-accent);
+  --white: #ffffff;
 
   /* FONTS */
   --font-body: Helvetica, Arial, sans-serif;
@@ -20,12 +32,6 @@
   --spacing-4: calc(var(--space-base) * 4);
   --spacing-5: calc(var(--space-base) * 5);
   --spacing-6: calc(var(--space-base) * 6);
-  --spacing-7: calc(var(--space-base) * 7);
-  --spacing-8: calc(var(--space-base) * 8);
-  --spacing-9: calc(var(--space-base) * 9);
-  --spacing-10: calc(var(--space-base) * 10);
-  --spacing-11: calc(var(--space-base) * 11);
-  --spacing-12: calc(var(--space-base) * 12);
 
   /* TYPOGRAPHY */
   --fs-base: 62.5%;
@@ -43,18 +49,16 @@
   --p-size: 1.6rem;
   --p-lh: 1.2;
   --p-ls: 0.2rem;
-  --p-mb: var(var(--spacing-2));
+  --p-mb: var(--spacing-2);
 
   /* BORDERS */
-  --header-size: 150px;
   --radius-sm: 2px;
   --radius: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
   --radius-round: 20px;
-  --border: 1px solid var(---color-border);
+  --border: 1px solid var(--color-border);
 
   /* SHADOWS */
-  --box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  --box-shadow: 0 0 10px var(--color-shadow);
 }

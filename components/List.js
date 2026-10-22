@@ -1,79 +1,72 @@
-/* eslint-disable no-underscore-dangle */
-
 import React, { useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
-const List = (props) => {
-  const { data = [], url } = props;
-  const { t } = useTranslation(url.split("/")[1]);
+// Table of documents with a search box.
+// `columns`: [{ key, label, link }] where `link(row)` returns the URL a cell
+// points to. A cell shows `row[key]`, or `row[key].name` for a populated
+// relation (e.g. the shop of an article).
+const cellText = (value) => {
+  if (value == null) return "";
+  if (typeof value === "object") return value.name ?? "";
+  return String(value);
+};
 
-  const [inputText, setInputText] = useState("");
+const List = ({ data, columns, loading = false }) => {
+  const { t } = useTranslation("common");
+  const [search, setSearch] = useState("");
 
-  const inputHandler = (e) => {
-    //convert input text to lower case
-    var lowerCase = e.target.value.toLowerCase();
-    setInputText(lowerCase);
-  };
-
-  const rows = Array.isArray(data) ? data : [];
-
-  if (rows.length === 0) {
-    return <div>Data is empty</div>;
+  if (loading) return <p className="status">{t("loading")}</p>;
+  if (!data || data.length === 0) {
+    return <p className="status">{t("empty")}</p>;
   }
 
-  const header = Object.keys(rows[0]);
-  header.shift();
-  header.pop();
+  const query = search.trim().toLowerCase();
+  const rows = data.filter((row) =>
+    columns.some(({ key }) => cellText(row[key]).toLowerCase().includes(query)),
+  );
 
   return (
     <div className="list">
       <div className="search__container">
-        <p className="search__title">{"Let's search"}</p>
+        <label className="search__title" htmlFor="list-search">
+          {t("search")}
+        </label>
         <input
+          id="list-search"
           className="search__input"
-          type="text"
-          placeholder="Search"
-          onChange={inputHandler}
+          type="search"
+          placeholder={t("search")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
       <table>
         <thead>
           <tr>
-            {header.map((head) => (
-              <th key={head}>{t(head, { ns: url.split("/")[1] })}</th>
+            {columns.map(({ key, label }) => (
+              <th key={key}>{label}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((dat) => {
-            return (
-              <tr key={dat._id}>
-                {header.map((key) => {
-                  if (dat[key] != null && dat[key]["_id"] !== undefined) {
-                    return (
-                      // eslint-disable-next-line react/jsx-key
-                      <td key={key}>
-                        <Link href={`${key}/${dat[key]["_id"]}`}>
-                          {dat[key]["name"]}
-                        </Link>
-                      </td>
-                    );
-                  } else {
-                    return (
-                      // eslint-disable-next-line react/jsx-key
-                      <td key={key}>
-                        <Link href={`${url}/${dat._id}`}>{dat[key]}</Link>
-                      </td>
-                    );
-                  }
-                })}
-              </tr>
-            );
-          })}
+          {rows.map((row) => (
+            <tr key={row._id}>
+              {columns.map(({ key, link }) => {
+                const href = link?.(row);
+                const text = cellText(row[key]);
+                return (
+                  <td key={key}>
+                    {href ? <Link href={href}>{text}</Link> : text}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
         </tbody>
       </table>
+      {rows.length === 0 && <p className="status">{t("no_result")}</p>}
     </div>
   );
 };

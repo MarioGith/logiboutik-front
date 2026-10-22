@@ -6,11 +6,15 @@
   "date": "Date de la transaction",
   "quantity": "Quantité associée",
   "transaction_type": "Type de transaction",
-  "articleId": "Id de l'article associé",
   "sell": "Vendu",
   "retrieve": "Repris",
   "deposite": "Déposé",
   "delete": "Supprimer la transaction",
   "article_placeholder": "Sélectionner un article",
-  "transaction_type_placeholder": "Sélectionner un type de transaction"
+  "transaction_type_placeholder": "Sélectionner un type de transaction",
+  "article_required": "Veuillez choisir un article",
+  "quantity_required": "Veuillez indiquer une quantité supérieure à 0",
+  "date_required": "Veuillez choisir une date",
+  "type_required": "Veuillez choisir un type de transaction",
+  "created": "Transaction créée"
 }

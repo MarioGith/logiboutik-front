@@ -1,1 +1,31 @@
-{ "search": "Chercher", "save": "Enregistrer", "modify": "Modifier" }
+{
+  "search": "Chercher",
+  "save": "Enregistrer",
+  "modify": "Modifier",
+  "saving": "Enregistrement…",
+  "loading": "Chargement…",
+  "empty": "Aucune donnée",
+  "no_result": "Aucun résultat pour cette recherche",
+  "saved": "Enregistré",
+  "deleted": "Supprimé",
+  "confirm_delete": "Supprimer définitivement ? Cette action est irréversible.",
+  "page_not_found": "Page introuvable",
+  "back_home": "Retour à l'accueil",
+  "menu": {
+    "transaction": "Transactions",
+    "article": "Articles",
+    "shop": "Boutiques",
+    "income": "Facture",
+    "stock": "Stock",
+    "company": "Entreprise"
+  },
+  "errors": {
+    "network": "Le serveur ne répond pas. Vérifiez votre connexion.",
+    "server_error": "Une erreur est survenue, veuillez réessayer.",
+    "invalid_input": "Données invalides : vérifiez les champs du formulaire.",
+    "not_found": "Élément introuvable (il a peut-être été supprimé).",
+    "article_exists": "Un article porte déjà ce nom.",
+    "shop_exists": "Une boutique porte déjà ce nom.",
+    "shop_has_articles": "Cette boutique contient encore des articles : supprimez-les ou déplacez-les d'abord."
+  }
+}

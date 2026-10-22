@@ -1,16 +1,14 @@
 import React from "react";
 
-const Button = (props) => {
-  const { onClick, label, warning } = props;
-  return (
-    <button
-      onClick={onClick}
-      type="submit"
-      style={warning ? { background: "red", color: "black" } : {}}
-    >
-      {label}
-    </button>
-  );
-};
+const Button = ({ onClick, label, warning = false, disabled = false }) => (
+  <button
+    onClick={onClick}
+    type="button"
+    disabled={disabled}
+    className={warning ? "button--danger" : undefined}
+  >
+    {label}
+  </button>
+);
 
 export default Button;

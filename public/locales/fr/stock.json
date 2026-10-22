@@ -9,5 +9,8 @@
   "client_placeholder": "Sélectionnez un client",
   "stock_name": "Nom du stock",
   "download": "Télécharger",
-  "create": "Créer un stock"
+  "generating": "Création du PDF…",
+  "create": "Créer un stock",
+  "no_stock": "Aucun article en stock",
+  "page": "Page"
 }

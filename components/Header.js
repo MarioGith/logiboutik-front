@@ -1,69 +1,35 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
+
+const LINKS = ["transaction", "article", "shop", "income", "stock", "company"];
 
 const Header = () => {
   const { pathname } = useRouter();
+  const { t } = useTranslation("common");
+
   return (
     <header>
       <Link href="/" className="logo">
         Logiboutik
       </Link>
 
-      <ul>
-        <li>
-          <Link
-            href="/transaction"
-            className={pathname === "/transaction" ? "header-active" : ""}
-          >
-            Transaction
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/article"
-            className={pathname === "/article" ? "header-active" : ""}
-          >
-            Article
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/shop"
-            className={pathname === "/shop" ? "header-active" : ""}
-          >
-            Shop
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/income"
-            className={pathname === "/income" ? "header-active" : ""}
-          >
-            Income
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/stock"
-            className={pathname === "/stock" ? "header-active" : ""}
-          >
-            Stock
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/company"
-            className={pathname === "/company" ? "header-active" : ""}
-          >
-            Company
-          </Link>
-        </li>
-      </ul>
+      <nav>
+        <ul>
+          {LINKS.map((link) => (
+            <li key={link}>
+              <Link
+                href={`/${link}`}
+                className={
+                  pathname.startsWith(`/${link}`) ? "header-active" : ""
+                }
+              >
+                {t(`menu.${link}`)}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   );
 };
